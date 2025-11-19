@@ -12,7 +12,7 @@
 1. **Clone and setup:**
    ```bash
    git clone <repo-url>
-   cd HER_eCom_Observability_IaC
+   cd release-please-2
    ```
 
 2. **Install dependencies and setup Git hooks:**
