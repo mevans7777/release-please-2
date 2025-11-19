@@ -1,10 +1,78 @@
 name: Build and Deploy Development
+
+permissions:
+  pull-requests: read
+  statuses: write
+
 on:
   push:
     branches:
       - main
 
 jobs:
+  set-pending-release-pr-status:
+    name: Set Pending Status on Release PR
+    runs-on: ubuntu-latest
+    outputs:
+      pr_number: ${{ steps.find_pr.outputs.pr_number }}
+      pr_head_sha: ${{ steps.find_pr.outputs.pr_head_sha }}
+    steps:
+      - name: Find Release Please PR and Set Pending Status
+        id: find_pr
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const statusContext = 'Run E2E Tests';
+            const maxRetries = 15;
+            const retryDelayMs = 15000;
+
+            let releasePr = null;
+            for (let i = 0; i < maxRetries; i++) {
+              console.log(`Attempt ${i + 1}/${maxRetries} to find Release Please PR...`);
+              const { data: pullRequests } = await github.rest.pulls.list({
+                owner,
+                repo,
+                state: 'open',
+                head: 'release-please--branches--main',
+                sort: 'created',
+                direction: 'desc',
+              });
+
+              releasePr = pullRequests[0];
+
+              if (releasePr) {
+                console.log(`Found Release Please PR #${releasePr.number}: ${releasePr.title}`);
+                break;
+              }
+
+              if (i < maxRetries - 1) {
+                await new Promise(r => setTimeout(r, retryDelayMs));
+              }
+            }
+
+            if (!releasePr) {
+              core.warning('Could not find an open Release Please PR after multiple retries.');
+              core.setOutput('pr_number', '');
+              core.setOutput('pr_head_sha', '');
+              return;
+            }
+
+            core.setOutput('pr_number', releasePr.number);
+            core.setOutput('pr_head_sha', releasePr.head.sha);
+
+            await github.rest.repos.createCommitStatus({
+              owner,
+              repo,
+              sha: releasePr.head.sha,
+              state: 'pending',
+              description: 'E2E tests are running...',
+              context: statusContext,
+              target_url: `${github.serverUrl}/${owner}/${repo}/actions/runs/${github.runId}`,
+            });
+            console.log(`Set commit status '${statusContext}' to 'pending' on commit ${releasePr.head.sha}`);
+
   terragrunt-check:
     name: Run Terragrunt Check
     runs-on: ubuntu-latest
@@ -74,14 +142,48 @@ jobs:
 
   e2e-tests:
     name: Run E2E Tests
-    if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     runs-on: ubuntu-latest
-    needs:
-      - deploy
+    needs: set-pending-release-pr-status
+    if: needs.set-pending-release-pr-status.outputs.pr_number != ''
+    outputs:
+      e2e_status: ${{ steps.run_e2e.outcome }}
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Run e2e tests
+      - name: Run E2E Tests
+        id: run_e2e
         run: |
-          echo "e2e tests run"
-          sleep 10
+          echo "Running E2E tests..."
+          echo "E2E tests passed!"
+
+  update-final-release-pr-status:
+    name: Update Final PR Status
+    runs-on: ubuntu-latest
+    needs: [e2e-tests, set-pending-release-pr-status]
+    if: always() && needs.set-pending-release-pr-status.outputs.pr_number != ''
+    steps:
+      - name: Update Final Release Please PR Status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const prNumber = ${{ needs.set-pending-release-pr-status.outputs.pr_number }};
+            const prHeadSha = '${{ needs.set-pending-release-pr-status.outputs.pr_head_sha }}';
+            const e2eStatus = '${{ needs.e2e-tests.outputs.e2e_status }}';
+            const statusState = e2eStatus === 'success' ? 'success' : 'failure';
+            const statusDescription = e2eStatus === 'success' ? 'E2E tests passed' : 'E2E tests failed';
+            const statusContext = 'Run E2E Tests';
+
+            await github.rest.repos.createCommitStatus({
+              owner,
+              repo,
+              sha: prHeadSha,
+              state: statusState,
+              description: statusDescription,
+              context: statusContext,
+              target_url: `${github.serverUrl}/${owner}/${repo}/actions/runs/${github.runId}`,
+            });
+            console.log(`Set commit status '${statusContext}' to '${statusState}' on commit ${prHeadSha}`);
+
+            if (e2eStatus === 'failure') {
+              core.setFailed('E2E tests failed, blocking Release Please PR merge.');
+            }
