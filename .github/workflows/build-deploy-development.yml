@@ -170,7 +170,7 @@ jobs:
   update-final-release-pr-status:
     name: Update Final PR Status
     runs-on: ubuntu-latest
-    if: "always() && ${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
+    if: always()
     needs: 
       - e2e-tests
       - set-pending-release-pr-status
