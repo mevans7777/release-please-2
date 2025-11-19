@@ -38,4 +38,3 @@ For detailed setup and configuration information, see the following guides:
 
 ### Setup & Development
 - [Repository Setup](./docs/repository-setup.md) - GitHub repository configuration and branch protection
-
