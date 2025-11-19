@@ -30,7 +30,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { owner, repo } = context.repo;
-            const statusContext = 'e2e-tests';
+            const statusContext = 'Run E2E Tests';
             const maxRetries = 15;
             const retryDelayMs = 15000;
 
@@ -177,7 +177,7 @@ jobs:
             const e2eStatus = '${{ needs.e2e-tests.outputs.e2e_status }}';
             const statusState = e2eStatus === 'success' ? 'success' : 'failure';
             const statusDescription = e2eStatus === 'success' ? 'E2E tests passed' : 'E2E tests failed';
-            const statusContext = 'e2e-tests';
+            const statusContext = 'Run E2E Tests';
 
             await github.rest.repos.createCommitStatus({
               owner,
