@@ -17,6 +17,12 @@ jobs:
       pr_number: ${{ steps.find_pr.outputs.pr_number }}
       pr_head_sha: ${{ steps.find_pr.outputs.pr_head_sha }}
     steps:
+
+      - name: sleep 30 seconds
+        run: |
+          echo "terrgrunt check run"
+          sleep 30
+
       - name: Find Release Please PR and Set Pending Status
         id: find_pr
         uses: actions/github-script@v7
@@ -24,7 +30,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { owner, repo } = context.repo;
-            const statusContext = 'e2e-tests';
+            const statusContext = 'Run E2E Tests';
             const maxRetries = 15;
             const retryDelayMs = 15000;
 
@@ -153,6 +159,7 @@ jobs:
         run: |
           echo "Running E2E tests..."
           echo "E2E tests passed!"
+          exit 1
 
   update-final-release-pr-status:
     name: Update Final PR Status
@@ -171,7 +178,7 @@ jobs:
             const e2eStatus = '${{ needs.e2e-tests.outputs.e2e_status }}';
             const statusState = e2eStatus === 'success' ? 'success' : 'failure';
             const statusDescription = e2eStatus === 'success' ? 'E2E tests passed' : 'E2E tests failed';
-            const statusContext = 'e2e-tests';
+            const statusContext = 'Run E2E Tests';
 
             await github.rest.repos.createCommitStatus({
               owner,
