@@ -5,25 +5,16 @@ permissions:
   statuses: write
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   set-pending-release-pr-status:
     name: Set Pending Status on Release PR
     runs-on: ubuntu-latest
-    if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     outputs:
       pr_number: ${{ steps.find_pr.outputs.pr_number }}
       pr_head_sha: ${{ steps.find_pr.outputs.pr_head_sha }}
     steps:
-
-      - name: sleep 30 seconds
-        run: |
-          echo "terrgrunt check run"
-          sleep 30
-
       - name: Find Release Please PR and Set Pending Status
         id: find_pr
         uses: actions/github-script@v7
@@ -83,7 +74,6 @@ jobs:
   terragrunt-check:
     name: Run Terragrunt Check
     runs-on: ubuntu-latest
-    if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     needs:
       - set-pending-release-pr-status
     steps:
@@ -97,7 +87,6 @@ jobs:
   terragrunt-plan:
     name: Run Terragrunt Plan
     runs-on: ubuntu-latest
-    if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     needs:
       - terragrunt-check
     steps:
@@ -111,7 +100,6 @@ jobs:
   code-build:
     name: Build Code
     runs-on: ubuntu-latest
-    if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     needs:
       - set-pending-release-pr-status
     steps:
@@ -125,7 +113,6 @@ jobs:
   code-package:
     name: Package Code
     runs-on: ubuntu-latest
-    if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     needs:
       - code-build
     steps:
@@ -139,7 +126,6 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     needs:
       - code-package
       - terragrunt-plan
@@ -154,7 +140,6 @@ jobs:
   e2e-tests:
     name: Run E2E Tests
     runs-on: ubuntu-latest
-    if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     needs:
       - deploy
     outputs:
@@ -171,9 +156,7 @@ jobs:
     name: Update Final PR Status
     runs-on: ubuntu-latest
     if: always()
-    needs: 
-      - e2e-tests
-      - set-pending-release-pr-status
+    needs: [e2e-tests, set-pending-release-pr-status]
     steps:
       - name: Update Final Release Please PR Status
         uses: actions/github-script@v7
