@@ -16,22 +16,35 @@ Go to **Settings → General → Pull Requests** and configure:
 
 ### 2. Branch Protection Rules
 
-Go to **Settings → Branches** and add a rule for `main`:
+Go to **Settings → Rulesets** and add a branch ruleset for `main`:
 
-#### Required Settings:
+Ruleset Name: `main`
+Enforcement status: `Active`
+Target branch: `main`
+
+#### Rules - Branch rules Required Settings:
+- ✅ **Restrict deletions**
+- ✅ **Require linear history**
 - ✅ **Require a pull request before merging**
+   - `Required approvals`: `1`
+   - `Require approval of the most recent reviewable push`: `true`
+   - `Allowed merge methods`: `Squash`
 - ✅ **Require status checks to pass before merging**
   - ✅ **Require branches to be up to date before merging** ← **Critical for clean squash merges**
   - ✅ **Status checks that are required:**
     - `pr-title-lint` (Validate PR Title)
     - `commit-lint` (Validate Commit Messages)
-
-#### Recommended Settings:
-- ✅ **Require linear history** (enforces squash merge only)
-- ✅ **Do not allow bypassing the above settings** (enforces rules for admins)
+    - `lint-code` (Lint Code)
+    - `unit-tests` (Run Unit Tests)
+    - `terrgrunt-check` (Run Terragrunt Check)
+    - `terrgrunt-plan` (Run Terragrunt Plan)
+    - `code-build` (Build Code)
+    - `code-package` (Package Code)
+    - `deploy` (Deploy)
+    - `e2e-tests` (Run E2E Tests)
+- ✅ **Block force pushes**
 
 #### Optional Security Settings:
-- ✅ **Restrict pushes that create files**
 - ✅ **Require signed commits**
 
 ### 3. PR Title Template
@@ -56,56 +69,6 @@ Brief description of changes
 **PR Title Format:** `<type>: <JIRA-TICKET> - <description>`
 **Example:** `feat: EVO-1234 - add user authentication`
 ```
-
-## GitHub Repository Settings Secrets Setup
-
-### 1. Relase Please Token
-
-Go to **Settings → Developer Settings → Personal access tokens** and create a new token with the following permissions:
-
-- ✅ **repo** (full control)
-- ✅ **workflow** (full control)
-- ✅ **write:packages** (full control)
-
-Add the token to your repository secrets as `RELEASE_PLEASE_GITHUB_TOKEN`.
-
-### 2. Coralogix API token for terraform
-
-Create a new "Team Keys" token in Coralogix for the terraform workflows. A key in each Coralogix team (nonprod and prod) to be created called terraform-sa with the role SENDDATA.
-
-Add the token to your repository secrets as `CORALOGIX_API_KEY_NONPROD`.
-
-Add the token to your repository secrets as `CORALOGIX_API_KEY_PROD`.
-
-### 3. Coralogix API token for OpenTelemetry collector
-
-Create a new "Send-Your-Data API keys" key in Coralogix for the OpenTelemetry collector. A key in each Coralogix team (nonprod and prod) to be created called otel-collector with the role SENDDATA 
-
-Add the token to your repository secrets as `OTEL_COLLECTOR_CORALOGIX_API_KEY_NONPROD`.
-
-Add the token to your repository secrets as `OTEL_COLLECTOR_CORALOGIX_API_KEY_PROD`.
-
-### 4. Fastly API token
-
-
-The Fastly API token is required for the `fastly-exporter` to scrape real-time analytics from the Fastly API. Follow these steps to create a token with the minimum required permissions.
-
-1.  **Navigate to the Fastly API token page**:
-    - Go to [**Account → Personal tokens**](https://manage.fastly.com/account/personal/tokens) in the Fastly UI.
-
-2.  **Create a new token** with the following settings:
-    - **Name**: `her-ecom-observability-iac` (or a descriptive name)
-    - **Scope**: `global:read` (Read-only access)
-    - **Services**: Select **All services** for access.
-    - **Expiration**: Choose an expiration date (e.g., 1 year). **Note**: For enhanced security, avoid setting the expiration to `Never`.
-
-3.  **Copy the generated token** immediately, as it will not be shown again.
-
-4.  **Add the token to GitHub repository secrets**:
-    - Go to **Settings → Secrets and variables → Actions** in your GitHub repository.
-    - Click **New repository secret**.
-    - Name the secret `FASTLY_PROMETHEUS_EXPORTER_API_KEY`.
-    - Paste the token value into the `Secret` field.
 
 ## Developer Workflow for Out-of-Date Branches
 
