@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0](https://github.com/mevans7777/release-please-2/compare/v1.2.0...v1.3.0) (2025-11-19)
+
+
+### Features
+
+* NOIRA-123 - trigger build/deploy from release please ([#10](https://github.com/mevans7777/release-please-2/issues/10)) ([e85598e](https://github.com/mevans7777/release-please-2/commit/e85598e79df8b35735a30aadc0bd66d0398893aa))
+
+
+### Bug Fixes
+
+* NOJIRA-123 - fix permissions for release please workflow ([edcf860](https://github.com/mevans7777/release-please-2/commit/edcf860573ebe604629a9f9a9a62d862682d8e98))
+* NOJIRA-123 - fix release please workflow ([3d63a7c](https://github.com/mevans7777/release-please-2/commit/3d63a7c49f8225742504fae55549b1e00c4dd10d))
+
 ## [1.2.0](https://github.com/mevans7777/release-please-2/compare/v1.1.0...v1.2.0) (2025-11-19)
 
 
