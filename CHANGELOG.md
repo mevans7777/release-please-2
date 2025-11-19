@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/mevans7777/release-please-2/compare/v1.1.0...v1.2.0) (2025-11-19)
+
+
+### Features
+
+* NOJIRA-123 - add check to release please PR ([#6](https://github.com/mevans7777/release-please-2/issues/6)) ([bfc1aa0](https://github.com/mevans7777/release-please-2/commit/bfc1aa037eb4b0030e2c09be5a04769868155c3a))
+
+
+### Bug Fixes
+
+* NOJIRA-123 - e2e tests exit 0 ([#9](https://github.com/mevans7777/release-please-2/issues/9)) ([5480ee0](https://github.com/mevans7777/release-please-2/commit/5480ee07255b5651493b4e050eac7e7a6dc3979d))
+
 ## [1.1.0](https://github.com/mevans7777/release-please-2/compare/v1.0.0...v1.1.0) (2025-11-19)
 
 
