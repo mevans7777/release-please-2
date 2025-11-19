@@ -1,0 +1,22 @@
+{
+  "name": "observability-sandbox",
+  "version": "1.0.0",
+  "description": "Observability sandbox with OpenTelemetry Collector and Coralogix",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "setup": "node scripts/setup-dev.js",
+    "setup:unix": "./scripts/setup-dev.sh",
+    "setup:win": "scripts\\setup-dev.bat",
+    "commitlint": "commitlint --edit",
+    "test:commitlint": "echo \"feat: EVO-1234 - test commit message\" | commitlint"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "husky": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
