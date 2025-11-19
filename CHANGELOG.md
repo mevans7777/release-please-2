@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.5.0](https://github.com/mevans7777/release-please-2/compare/v1.4.0...v1.5.0) (2025-11-19)
+
+
+### Features
+
+* NOJIRA-123 - test run ([#14](https://github.com/mevans7777/release-please-2/issues/14)) ([b452007](https://github.com/mevans7777/release-please-2/commit/b4520079d9bf5b20aaba93a03ec8b6bd0e982ec9))
+
+
+### Bug Fixes
+
+* NOJIRA-123 - fix e2e ([#16](https://github.com/mevans7777/release-please-2/issues/16)) ([fcd990d](https://github.com/mevans7777/release-please-2/commit/fcd990dac5508b449139a34b93479a1f75a0bceb))
+
 ## [1.4.0](https://github.com/mevans7777/release-please-2/compare/v1.3.0...v1.4.0) (2025-11-19)
 
 
