@@ -150,7 +150,7 @@ jobs:
         run: |
           echo "Running E2E tests..."
           echo "E2E tests passed!"
-          exit 0
+          exit 1
 
   update-final-release-pr-status:
     name: Update Final PR Status
