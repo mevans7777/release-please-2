@@ -69,7 +69,7 @@ jobs:
               state: 'pending',
               description: 'E2E tests are running...',
               context: statusContext,
-              target_url: `${github.serverUrl}/${owner}/${repo}/actions/runs/${github.runId}`,
+              target_url: `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`,
             });
             console.log(`Set commit status '${statusContext}' to 'pending' on commit ${releasePr.head.sha}`);
 
@@ -180,7 +180,7 @@ jobs:
               state: statusState,
               description: statusDescription,
               context: statusContext,
-              target_url: `${github.serverUrl}/${owner}/${repo}/actions/runs/${github.runId}`,
+              target_url: `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`,
             });
             console.log(`Set commit status '${statusContext}' to '${statusState}' on commit ${prHeadSha}`);
 
