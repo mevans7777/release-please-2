@@ -1,12 +1,14 @@
 name: Pull Request
 on: 
   pull_request:
-    types: [opened, synchronize, edited]
+    types:
+      - opened
+      - reopened
+      - synchronize
     branches:
       - main
 
 jobs:
-  # Note: To change bot exclusion condition, update both job 'if' conditions below
   pr-title-lint:
     name: Validate PR Title
     runs-on: ubuntu-latest
@@ -48,3 +50,110 @@ jobs:
       - name: Validate commit messages
         run: |
           git log -1 --pretty=format:"%s" ${{ github.event.pull_request.head.sha }} | npx commitlint --verbose
+
+  code-lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    if: "${{ !startsWith(github.event.pull_request.title, 'chore(main): release') }}"
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Lint code
+        run: |
+          echo "linting performed"
+          sleep 10
+
+  unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    if: "${{ !startsWith(github.event.pull_request.title, 'chore(main): release') }}"
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run unit tests
+        run: |
+          echo "unit tests run"
+          sleep 10
+
+  terragrunt-check:
+    name: Run Terragrunt Check
+    runs-on: ubuntu-latest
+    if: "${{ !startsWith(github.event.pull_request.title, 'chore(main): release') }}"
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run terragrunt check
+        run: |
+          echo "terrgrunt check run"
+          sleep 10
+
+  terragrunt-plan:
+    name: Run Terragrunt Plan
+    runs-on: ubuntu-latest
+    if: "${{ !startsWith(github.event.pull_request.title, 'chore(main): release') }}"
+    needs:
+      - terragrunt-check
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run terragrunt plan
+        run: |
+          echo "terrgrunt plan run"
+          sleep 10
+
+  code-build:
+    name: Build Code
+    runs-on: ubuntu-latest
+    if: "${{ !startsWith(github.event.pull_request.title, 'chore(main): release') }}"
+    needs:
+      - code-lint
+      - unit-tests
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build code
+        run: |
+          echo "code built"
+          sleep 10
+
+  code-package:
+    name: Package Code
+    runs-on: ubuntu-latest
+    if: "${{ !startsWith(github.event.pull_request.title, 'chore(main): release') }}"
+    needs:
+      - code-build
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Package code
+        run: |
+          echo "code packaged"
+          sleep 10
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: "${{ !startsWith(github.event.pull_request.title, 'chore(main): release') }}"
+    needs:
+      - code-package
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy code
+        run: |
+          echo "code deployed"
+          sleep 10
+
+  e2e-tests:
+    name: Run E2E Tests
+    runs-on: ubuntu-latest
+    if: "${{ !startsWith(github.event.pull_request.title, 'chore(main): release') }}"
+    needs:
+      - deploy
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run e2e tests
+        run: |
+          echo "e2e tests run"
+          sleep 10
