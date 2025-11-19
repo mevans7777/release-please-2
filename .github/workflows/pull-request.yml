@@ -136,6 +136,7 @@ jobs:
     if: "${{ !startsWith(github.event.pull_request.title, 'chore(main): release') }}"
     needs:
       - code-package
+      - terragrunt-plan
     steps:
       - uses: actions/checkout@v4
       
