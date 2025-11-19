@@ -13,6 +13,7 @@ jobs:
   set-pending-release-pr-status:
     name: Set Pending Status on Release PR
     runs-on: ubuntu-latest
+    if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     outputs:
       pr_number: ${{ steps.find_pr.outputs.pr_number }}
       pr_head_sha: ${{ steps.find_pr.outputs.pr_head_sha }}
@@ -83,6 +84,8 @@ jobs:
     name: Run Terragrunt Check
     runs-on: ubuntu-latest
     if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
+    needs:
+      - set-pending-release-pr-status
     steps:
       - uses: actions/checkout@v4
       
@@ -109,6 +112,8 @@ jobs:
     name: Build Code
     runs-on: ubuntu-latest
     if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
+    needs:
+      - set-pending-release-pr-status
     steps:
       - uses: actions/checkout@v4
       
@@ -149,8 +154,9 @@ jobs:
   e2e-tests:
     name: Run E2E Tests
     runs-on: ubuntu-latest
-    needs: set-pending-release-pr-status
-    if: needs.set-pending-release-pr-status.outputs.pr_number != ''
+    if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
+    needs:
+      - deploy
     outputs:
       e2e_status: ${{ steps.run_e2e.outcome }}
     steps:
@@ -164,8 +170,10 @@ jobs:
   update-final-release-pr-status:
     name: Update Final PR Status
     runs-on: ubuntu-latest
-    needs: [e2e-tests, set-pending-release-pr-status]
-    if: always() && needs.set-pending-release-pr-status.outputs.pr_number != ''
+    if: "${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}"
+    needs: 
+      - e2e-tests
+      - set-pending-release-pr-status
     steps:
       - name: Update Final Release Please PR Status
         uses: actions/github-script@v7
