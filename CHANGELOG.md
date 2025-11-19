@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/mevans7777/release-please-2/compare/v1.3.0...v1.4.0) (2025-11-19)
+
+
+### Features
+
+* NOJIRA-123 - test release process ([#12](https://github.com/mevans7777/release-please-2/issues/12)) ([65be2d4](https://github.com/mevans7777/release-please-2/commit/65be2d42d400ec954ee339b409d6c5e6496cbabd))
+
 ## [1.3.0](https://github.com/mevans7777/release-please-2/compare/v1.2.0...v1.3.0) (2025-11-19)
 
 
